@@ -1,0 +1,30 @@
+#!/bin/sh
+if [ -d dist ]; then
+	rm dist -rf
+fi
+mkdir dist
+cd dist
+brython-cli --install
+rm README.txt
+rm demo.html
+rm index.html
+cd ..
+
+python3 preprocessor.py $1 dist/$1
+
+cat << EOF > dist/index.html
+<html>
+	<head>
+		<meta charset="utf-8">
+		<script type="text/javascript" src="brython.js"></script>
+		<script type="text/javascript" src="brython_stdlib.js"></script>	
+		<script type="text/python" src="brow.py" id="browpy"></script>
+		<script type="text/python" src="$1"></script>
+	</head>
+	<body onload="brython()"></body>
+</html>
+EOF
+
+cp brow.py dist/brow.py
+cd dist
+python3 -m http.server --bind localhost
