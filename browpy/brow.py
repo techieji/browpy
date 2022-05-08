@@ -70,7 +70,7 @@ class Element:
 def title(name):
     document.select('head')[0] <= bry_html.TITLE(name)
 
-def favicon(file):
+def favicon(filen):
     print('Favicons not supported yet.')
 
 def set_root(elem):

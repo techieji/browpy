@@ -10,7 +10,9 @@ rm demo.html
 rm index.html
 cd ..
 
-python3 preprocessor.py $1 dist/$1
+python3 preprocessor.py $1 /tmp/$1
+# pyminifier --obfuscate-builtins --obfuscate-variables --obfuscate-import-methods /tmp/$1 > dist/$1
+pyminifier /tmp/$1 > dist/$1
 
 cat << EOF > dist/index.html
 <html>
@@ -25,6 +27,7 @@ cat << EOF > dist/index.html
 </html>
 EOF
 
-cp brow.py dist/brow.py
+# pyminifier --obfuscate-builtins --obfuscate-variables --obfuscate-import-methods brow.py > dist/brow.py
+pyminifier brow.py > dist/brow.py
 cd dist
 python3 -m http.server --bind localhost
