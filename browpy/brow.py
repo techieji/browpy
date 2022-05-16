@@ -3,33 +3,29 @@ import browser.html as bry_html
 
 class HTMLElement:
     def __init__(self, name, attrs, *subelements):
-        if str(name).upper() == 'BUTTON ON_CLICK=<FUNCTION FN>':
-            raise Exception('Error detected!')
         self.name = name
         self.attrs = attrs
         self.subelements = subelements
         self.elem = None
 
-    def update(self, upper):
-        new_elem = self.render()
-        if type(new_elem) is HTMLElement:
-            new_elem.update(upper)
+    def update(self, upper, old=None):
+        # new_elem = self.render()
+        new_elem = getattr(bry_html, self.name.upper())(**self.attrs)
         if self.elem is not None and self.elem.parentNode is not None:    # 2nd condition is if element isn't linked to document?
-            self.elem.parentNode.replaceChild(new_elem, self.elem)
+            self.elem.parentNode.replaceChild(new_elem, self.elem if old is None else old)
         else:
             upper <= new_elem
+        if old is not None and old.elem is not None and old.elem.parentNode is not None:
+            old.elem.parentNode.removeChild(old.elem)
         self.elem = new_elem
-        print('Starting loop')
-        print(self.name, self.attrs, self.subelements)
         for attr, v in self.attrs.items():
             if attr.startswith('on_'):
-                print('shortcut:', attr[3:], v)
                 self.elem.bind(attr[3:], v)
-            else:
-                print('attr:', attr)
         for x in self.subelements:
             if type(x) is HTMLElement:
                 x.update(self.elem)
+            elif type(x) is str:
+                self.elem <= x
 
     def replace_with(self, new_elem):
         self.elem.parentNode.replaceChild(new_elem.elem, self.elem)
@@ -63,8 +59,9 @@ class Element:
             self.elem.update(upper)
         else:
             new_elem = self.render()
-            new_elem.elem = new_elem.render()
-            self.elem.replace_with(new_elem)
+            new_elem.update(upper, self.elem)
+            # new_elem.elem = new_elem.render()
+            # self.elem.replace_with(new_elem)
             self.elem = new_elem
         for attr in dir(self):    # Avoid rebinding methods every update?
             if attr.startswith('on_'):

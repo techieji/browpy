@@ -14,13 +14,11 @@ class Preprocessor(HTMLParser):
         attrs_dict_str = '{'
         for k, v in attrs:
             attrs_dict_str += repr(k) + ': '
-            print(k, v)
             if v[0] == '{' and v[-1] == '}':
                 attrs_dict_str += v[1:-1]
             else:
                 attrs_dict_str += repr(v)
         attrs_dict_str += '}'
-        print('newstyle')
         self.final_text += f'HTMLElement(f"{tag}", {attrs_dict_str}, '
 
     def handle_data(self, data):
