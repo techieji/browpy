@@ -8,14 +8,24 @@ class Preprocessor(HTMLParser):
         self.final_text = ""
         self.level = 0
 
-    def handle_starttag(self, _, attrs):
-        tag = self.get_actual_tag()
+    def handle_starttag(self, tag, attrs):
+        # tag = self.get_actual_tag()
         self.level += 1
-        self.final_text += f'HTMLElement(f"{tag}", {dict(attrs)}, '
+        attrs_dict_str = '{'
+        for k, v in attrs:
+            attrs_dict_str += repr(k) + ': '
+            print(k, v)
+            if v[0] == '{' and v[-1] == '}':
+                attrs_dict_str += v[1:-1]
+            else:
+                attrs_dict_str += repr(v)
+        attrs_dict_str += '}'
+        print('newstyle')
+        self.final_text += f'HTMLElement(f"{tag}", {attrs_dict_str}, '
 
     def handle_data(self, data):
         if self.level:
-            self.final_text += f'f"{data}", '
+            self.final_text += f'f"""{data}""", '
         else:
             self.final_text += data
 

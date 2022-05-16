@@ -1,18 +1,26 @@
 #!/bin/sh
-if [ -d dist ]; then
-	rm dist -rf
-fi
-mkdir dist
+
+set -e
+
+# if [ -d dist ]; then
+# 	rm dist -rf
+# fi
+# mkdir dist
+# cd dist
+# brython-cli --install
+
+rm dist -rf
+cp ~/.local/lib/python3.8/site-packages/brython/data dist -r     # Can't and won't figure out how to get above to work
 cd dist
-brython-cli --install
+
 rm README.txt
 rm demo.html
 rm index.html
 cd ..
 
 python3 preprocessor.py $1 /tmp/$1
-# pyminifier --obfuscate-builtins --obfuscate-variables --obfuscate-import-methods /tmp/$1 > dist/$1
-pyminifier /tmp/$1 > dist/$1
+# pyminifier /tmp/$1 > dist/$1
+cp /tmp/$1 dist/$1
 
 cat << EOF > dist/index.html
 <html>
@@ -27,7 +35,7 @@ cat << EOF > dist/index.html
 </html>
 EOF
 
-# pyminifier --obfuscate-builtins --obfuscate-variables --obfuscate-import-methods brow.py > dist/brow.py
-pyminifier brow.py > dist/brow.py
+# pyminifier brow.py > dist/brow.py
+cp brow.py dist/brow.py
 cd dist
 python3 -m http.server --bind localhost
