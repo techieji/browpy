@@ -75,7 +75,7 @@ class Element:
         for attr in dir(self):    # Avoid rebinding methods every update?
             if attr.startswith('on_'):
                 print(attr[3:], getattr(self, attr))
-                self.elem.bind(attr[3:], getattr(self, attr))
+                self.elem.elem.bind(attr[3:], getattr(self, attr))
 
     def render(self):
         raise NotImplementedError()

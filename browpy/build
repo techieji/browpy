@@ -9,14 +9,11 @@ set -e
 # cd dist
 # brython-cli --install
 
-rm dist -rf
-cp ~/.local/lib/python3.8/site-packages/brython/data dist -r     # Can't and won't figure out how to get above to work
-cd dist
+# rm dist -rf
+# cp ~/.local/lib/python3.8/site-packages/brython/data dist -r     # Can't and won't figure out how to get above to work
+# cd dist
 
-rm README.txt
-rm demo.html
-rm index.html
-cd ..
+cp template dist -r
 
 python3 preprocessor.py $1 /tmp/$1
 # pyminifier /tmp/$1 > dist/$1
@@ -38,4 +35,4 @@ EOF
 # pyminifier brow.py > dist/brow.py
 cp brow.py dist/brow.py
 cd dist
-python3 -m http.server --bind localhost
+python3 -m http.server # --bind localhost
