@@ -1,14 +1,25 @@
 from browser import document
 import browser.html as bry_html
 
+_attrdict = type('AttrDict', (dict,), {'__getitem__': dict.get, '__setitem__': dict.__setattr__})
+
 class HTMLElement:
     def __init__(self, name, attrs, *subelements):
         self.name = name
-        self.attrs = attrs
+        self.attrs = _attrdict(attrs)
         self.subelements = subelements
         self.elem = None
+        self.upper = None
 
-    def update(self, upper, old=None):
+    def set_subordinates(self):
+        for x in self.subelements:
+            if type(x) is HTMLElement:
+                x.upper = self.elem
+
+    def update(self, upper=None, old=None):
+        upper = self.upper if upper is None else upper
+        if type(upper) is HTMLElement:
+            upper = upper.elem
         # new_elem = self.render()
         new_elem = getattr(bry_html, self.name.upper())(**self.attrs)
         if self.elem is not None and self.elem.parentNode is not None:    # 2nd condition is if element isn't linked to document?
@@ -18,12 +29,13 @@ class HTMLElement:
         if old is not None and old.elem is not None and old.elem.parentNode is not None:
             old.elem.parentNode.removeChild(old.elem)
         self.elem = new_elem
+        self.set_subordinates()
         for attr, v in self.attrs.items():
             if attr.startswith('on_'):
                 self.elem.bind(attr[3:], v)
         for x in self.subelements:
             if type(x) is HTMLElement:
-                x.update(self.elem)
+                x.update()
             elif type(x) is str:
                 self.elem <= x
 
