@@ -16,31 +16,36 @@ class HTMLElement:
             if type(x) is HTMLElement:
                 x.upper = self.elem
 
-    def update(self, upper=None, old=None):
-        upper = self.upper if upper is None else upper
-        if type(upper) is HTMLElement:
-            upper = upper.elem
-        # new_elem = self.render()
-        new_elem = getattr(bry_html, self.name.upper())(**self.attrs)
-        if self.elem is not None and self.elem.parentNode is not None:    # 2nd condition is if element isn't linked to document?
-            self.elem.parentNode.replaceChild(new_elem, self.elem if old is None else old)
-        else:
-            upper <= new_elem
-        if old is not None and old.elem is not None and old.elem.parentNode is not None:
+    @staticmethod
+    def remove_node(old):
+        try:
             old.elem.parentNode.removeChild(old.elem)
-        self.elem = new_elem
-        self.set_subordinates()
+        except AttributeError:
+            pass
+
+    def _update_node(self, new_elem, upper):
+        try:
+            self.elem.parentNode.replaceChild(new_elem, self.elem if old is None else old)
+        except AttributeError:
+            (self.upper if upper is None else upper).attach(new_elem)
+
+    def bind_attrs(self):
         for attr, v in self.attrs.items():
             if attr.startswith('on_'):
                 self.elem.bind(attr[3:], v)
+
+    def update(self, upper=None, old=None):
+        new_elem = getattr(bry_html, self.name.upper())(**self.attrs)
+        self._update_node(new_elem, upper)
+        HTMLElement.remove_node(old)
+        self.elem = new_elem
+        self.set_subordinates()
+        self.bind_attrs()
         for x in self.subelements:
             if type(x) is HTMLElement:
                 x.update()
             elif type(x) is str:
                 self.elem <= x
-
-    def replace_with(self, new_elem):
-        self.elem.parentNode.replaceChild(new_elem.elem, self.elem)
 
     def render(self):
         s = ""
@@ -52,12 +57,6 @@ class HTMLElement:
             else:
                 s += x
         return getattr(bry_html, self.name.upper())(s, **self.attrs)
-
-    def set_text(self, *new_content):
-        self.subelements = new_content
-
-    def bind(self, event_name, fn):
-        self.elem.bind(event_name, fn)
 
 class Element:
     def __init__(self, attrs):
@@ -72,8 +71,6 @@ class Element:
         else:
             new_elem = self.render()
             new_elem.update(upper, self.elem)
-            # new_elem.elem = new_elem.render()
-            # self.elem.replace_with(new_elem)
             self.elem = new_elem
         for attr in dir(self):    # Avoid rebinding methods every update?
             if attr.startswith('on_'):
