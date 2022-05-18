@@ -1,15 +1,15 @@
-from browpy import document, Element, HTMLElement, title
+from browpy import document, Element, HTMLElement, title, set_root
 
 def incrementor(obj):
     def fn(_):
         obj.n += 1
-        obj.update(document)
+        obj.update()
     return fn
 
 def decrementor(obj):
     def fn(_):
         obj.n -= 1
-        obj.update(document)
+        obj.update()
     return fn
 
 class Number(Element):
@@ -27,4 +27,4 @@ class Number(Element):
 
 title("Counting Tool")
 n = <Number/>
-n.update(document)
+set_root(n)
