@@ -6,7 +6,6 @@ authors = ["PradhyumR <<>>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-pytest-browser = "^0.2.0"
 
 [tool.poetry.dev-dependencies]
 
