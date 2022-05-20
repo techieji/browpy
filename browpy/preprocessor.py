@@ -11,14 +11,7 @@ class Preprocessor(HTMLParser):
     def handle_starttag(self, tag, attrs):
         # tag = self.get_actual_tag()
         self.level += 1
-        attrs_dict_str = '{'
-        for k, v in attrs:
-            attrs_dict_str += repr(k) + ': '
-            if v[0] == '{' and v[-1] == '}':
-                attrs_dict_str += v[1:-1]
-            else:
-                attrs_dict_str += repr(v)
-        attrs_dict_str += '}'
+        attrs_dict_str = Preprocessor.preprocess_attrs(attrs)
         self.final_text += f'HTMLElement(f"{tag}", {attrs_dict_str}, '
 
     def handle_data(self, data):
@@ -43,11 +36,23 @@ class Preprocessor(HTMLParser):
             self.final_text += ', '
 
     def get_actual_tag(self):
-        return self.get_starttag_text().replace('<', '').replace('>', '').replace('/', '').strip()
+        return self.get_starttag_text().replace('<', '').replace('>', '').replace('/', '').strip().split()[0]
 
     @classmethod
     def is_html_tag(klass, tag):
         return tag.upper() in klass.TAGS
+
+    @staticmethod
+    def preprocess_attrs(attrs):
+        attrs_dict_str = '{'
+        for k, v in attrs:
+            attrs_dict_str += repr(k) + ': '
+            if v[0] == '{' and v[-1] == '}':
+                attrs_dict_str += v[1:-1]
+            else:
+                attrs_dict_str += 'f' + repr(v)
+        attrs_dict_str += '}'
+        return attrs_dict_str
 
 if __name__ == '__main__':
     import sys
